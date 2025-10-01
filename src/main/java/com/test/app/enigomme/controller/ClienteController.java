@@ -5,11 +5,13 @@ import com.test.app.enigomme.service.ClienteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
+
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/clienti")
-public class    ClienteController {
+public class ClienteController {
 
     private final ClienteService clienteService;
 
@@ -17,48 +19,53 @@ public class    ClienteController {
         this.clienteService = clienteService;
     }
 
-    @GetMapping ("/list")
-    public List<Cliente> getAll() {
-        return clienteService.findAll();
+    // ✅ Lista clienti
+    @GetMapping("/list")
+    public ResponseEntity<List<Cliente>> getAll() {
+        return ResponseEntity.ok(clienteService.findAll());
     }
 
+    // ✅ Dettaglio cliente
     @GetMapping("/{id}")
     public ResponseEntity<Cliente> getById(@PathVariable Long id) {
-        return clienteService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Cliente cliente = clienteService.findById(id);
+        return ResponseEntity.ok(cliente);
     }
 
-    @PostMapping("/new")
-    public Cliente create(@RequestBody Cliente cliente) {
-        return clienteService.save(cliente);
+    // ✅ Creazione nuovo cliente
+    @PostMapping
+    public ResponseEntity<Cliente> create(@RequestBody Cliente cliente) {
+        Cliente saved = clienteService.save(cliente);
+        return ResponseEntity
+                .created(URI.create("/api/clienti/" + saved.getId())) // 201 Created + Location header
+                .body(saved);
     }
 
-    @PutMapping("/edit/{id}")
+    // ✅ Modifica cliente esistente
+    @PutMapping("/{id}")
     public ResponseEntity<Cliente> update(@PathVariable Long id, @RequestBody Cliente cliente) {
-        return clienteService.findById(id)
-                .map(existing -> {
-                    cliente.setId(id);
-                    Cliente updated = clienteService.save(cliente);
-                    return ResponseEntity.ok(updated);
-                })
-                .orElse(ResponseEntity.notFound().build());
+        Cliente existing = clienteService.findById(id);
+        existing.setNome(cliente.getNome());
+        existing.setCognome(cliente.getCognome());
+        existing.setEmail(cliente.getEmail());
+        existing.setTelefono(cliente.getTelefono());
+        Cliente updated = clienteService.save(existing);
+        return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/delete/{id}")
+    // ✅ Eliminazione cliente
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        return clienteService.findById(id)
-                .map(existing -> {
-                    clienteService.deleteById(id);
-                    return ResponseEntity.noContent().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        clienteService.deleteById(id);
+        return ResponseEntity.noContent().build(); // 204 No Content
     }
 
-    // Ricerca per nome e cognome (passa parametri opzionali ?nome=xxx&cognome=yyy)
+    // ✅ Ricerca per nome e cognome
     @GetMapping("/search")
-    public List<Cliente> search(@RequestParam(defaultValue = "") String nome,
-                                @RequestParam(defaultValue = "") String cognome) {
-        return clienteService.searchByNomeAndCognome(nome, cognome);
+    public ResponseEntity<List<Cliente>> search(@RequestParam(defaultValue = "") String nome,
+                                                @RequestParam(defaultValue = "") String cognome) {
+        return ResponseEntity.ok(
+                clienteService.searchByNomeAndCognome(nome, cognome)
+        );
     }
 }

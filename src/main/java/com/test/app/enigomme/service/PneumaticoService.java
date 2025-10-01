@@ -5,7 +5,6 @@ import com.test.app.enigomme.repository.PneumaticoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PneumaticoService {
@@ -20,8 +19,9 @@ public class PneumaticoService {
         return pneumaticoRepository.findAll();
     }
 
-    public Optional<Pneumatico> findById(Long id) {
-        return pneumaticoRepository.findById(id);
+    public Pneumatico findById(Long id) {
+        return pneumaticoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pneumatico con id " + id + " non trovato"));
     }
 
     public Pneumatico save(Pneumatico pneumatico) {
@@ -29,10 +29,14 @@ public class PneumaticoService {
     }
 
     public void deleteById(Long id) {
+        if (!pneumaticoRepository.existsById(id)) {
+            throw new RuntimeException("Pneumatico con id " + id + " non trovato");
+        }
         pneumaticoRepository.deleteById(id);
     }
 
     public List<Pneumatico> findByClienteNomeAndCognome(String nome, String cognome) {
-        return pneumaticoRepository.findByVeicoloClienteNomeContainingIgnoreCaseAndVeicoloClienteCognomeContainingIgnoreCase(nome, cognome);
+        return pneumaticoRepository
+                .findByVeicoloClienteNomeContainingIgnoreCaseAndVeicoloClienteCognomeContainingIgnoreCase(nome, cognome);
     }
 }

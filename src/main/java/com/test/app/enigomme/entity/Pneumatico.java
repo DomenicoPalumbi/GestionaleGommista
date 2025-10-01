@@ -1,8 +1,15 @@
 package com.test.app.enigomme.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.util.Date;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "pneumatico")
 public class Pneumatico {
@@ -22,10 +29,22 @@ public class Pneumatico {
     private Date dataDeposito;
 
     @ManyToOne
-    @JoinColumn(name = "veicolo_id")  // FK veicolo_id nella tabella pneumatico
+    @JoinColumn(name = "veicolo_id")
     private Veicolo veicolo;
 
-    // getter e setter
+    @Override
+    public String toString() {
+        return "Pneumatico{" +
+                "id=" + id +
+                ", marca='" + marca + '\'' +
+                ", modello='" + modello + '\'' +
+                ", dimensione='" + dimensione + '\'' +
+                ", matricolaDot='" + matricolaDot + '\'' +
+                ", battistrada='" + battistrada + '\'' +
+                ", numeroPezzi=" + numeroPezzi +
+                ", dataDeposito=" + dataDeposito +
+                '}';
+    }
 
     public Long getId() {
         return id;
@@ -33,14 +52,6 @@ public class Pneumatico {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Veicolo getVeicolo() {
-        return veicolo;
-    }
-
-    public void setVeicolo(Veicolo veicolo) {
-        this.veicolo = veicolo;
     }
 
     public String getMarca() {
@@ -97,5 +108,13 @@ public class Pneumatico {
 
     public void setDataDeposito(Date dataDeposito) {
         this.dataDeposito = dataDeposito;
+    }
+
+    public Veicolo getVeicolo() {
+        return veicolo;
+    }
+
+    public void setVeicolo(Veicolo veicolo) {
+        this.veicolo = veicolo;
     }
 }

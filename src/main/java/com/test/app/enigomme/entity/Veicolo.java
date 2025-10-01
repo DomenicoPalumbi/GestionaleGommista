@@ -1,8 +1,14 @@
 package com.test.app.enigomme.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "veicolo")
 public class Veicolo {
@@ -15,13 +21,20 @@ public class Veicolo {
     private String modello;
 
     @ManyToOne
-    @JoinColumn(name = "cliente_id")  // FK verso cliente
+    @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
-    @OneToMany(mappedBy = "veicolo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "veicolo", cascade = CascadeType.ALL, orphanRemoval = true , fetch = FetchType.EAGER)
     private List<Pneumatico> pneumatici;
 
-    // Getter e Setter
+    @Override
+    public String toString() {
+        return "Veicolo{" +
+                "id=" + id +
+                ", marca='" + marca + '\'' +
+                ", modello='" + modello + '\'' +
+                '}';
+    }
 
     public Long getId() {
         return id;

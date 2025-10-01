@@ -20,16 +20,22 @@ public class ClienteService {
         return clienteRepository.findAll();
     }
 
-    public Optional<Cliente> findById(Long id) {
-        return clienteRepository.findById(id);
+    public Cliente findById(Long id) {
+        return clienteRepository.findById(id)
+          .orElseThrow(() -> new RuntimeException("Cliente non trovato con id: " + id));
     }
 
     public Cliente save(Cliente cliente) {
-
+        if(clienteRepository.existsByEmail(cliente.getEmail())) {
+            throw new RuntimeException("Cliente con questa email già esiste");
+        }
         return clienteRepository.save(cliente);
     }
 
     public void deleteById(Long id) {
+        if(!clienteRepository.existsById(id)) {
+            throw new RuntimeException("Cliente non trovato con id: " + id);
+        }
         clienteRepository.deleteById(id);
     }
 

@@ -5,7 +5,6 @@ import com.test.app.enigomme.repository.VeicoloRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class VeicoloService {
@@ -20,8 +19,9 @@ public class VeicoloService {
         return veicoloRepository.findAll();
     }
 
-    public Optional<Veicolo> findById(Long id) {
-        return veicoloRepository.findById(id);
+    public Veicolo findById(Long id) {
+        return veicoloRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Veicolo non trovato con id: " + id));
     }
 
     public Veicolo save(Veicolo veicolo) {
@@ -29,9 +29,14 @@ public class VeicoloService {
     }
 
     public void deleteById(Long id) {
+        if (!veicoloRepository.existsById(id)) {
+            throw new RuntimeException("Veicolo non trovato con id: " + id);
+        }
         veicoloRepository.deleteById(id);
     }
-    public List<Veicolo> findByClienteNomeAndCognome(String nome, String cognome){
-     return veicoloRepository.findByClienteNomeContainingIgnoreCaseAndClienteCognomeContainingIgnoreCase(nome ,cognome);
+
+    public List<Veicolo> findByClienteNomeAndCognome(String nome, String cognome) {
+        return veicoloRepository
+                .findByClienteNomeContainingIgnoreCaseAndClienteCognomeContainingIgnoreCase(nome, cognome);
     }
 }
